@@ -1,9 +1,14 @@
 $ErrorActionPreference = "Stop"
 
-$pythonExe = ".venv\\Scripts\\python.exe"
-if (-not (Test-Path $pythonExe)) {
-    throw "Missing $pythonExe. Run .\\setup.ps1 first."
+# Ensure we run relative to the script folder (repo root)
+Set-Location -Path $PSScriptRoot
+
+$pythonExe = Join-Path -Path $PSScriptRoot -ChildPath ".venv\Scripts\python.exe"
+if (-not (Test-Path -Path $pythonExe)) {
+    throw "Missing $pythonExe. Run .\setup.ps1 first."
 }
+
+$srcDir = Join-Path -Path $PSScriptRoot -ChildPath "src"
 
 $files = @(
     "00_inspect_libe.py",
@@ -16,8 +21,9 @@ $files = @(
 )
 
 foreach ($f in $files) {
+    $scriptPath = Join-Path -Path $srcDir -ChildPath $f
     Write-Host "==> Running $f"
-    & $pythonExe (Join-Path "src" $f)
+    & $pythonExe $scriptPath
 }
 
 Write-Host "All scripts finished."

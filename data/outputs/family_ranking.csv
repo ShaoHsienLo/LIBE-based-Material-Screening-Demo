@@ -1,0 +1,5 @@
+family,best_y_pred,best_id,best_smiles,count
+CFNS,-4401.799,libe-501928,C.F.N.S,7
+CNOS,-4193.559,libe-501998,C.N.O.S,3
+CFS,-4004.462,libe-497494,C.F.S,1
+CFNOS,-3843.7937,libe-501983,C.F.N.O.S,9

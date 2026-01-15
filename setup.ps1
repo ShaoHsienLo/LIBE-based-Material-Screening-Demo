@@ -1,14 +1,16 @@
 $ErrorActionPreference = "Stop"
 
-$venvPath = ".venv"
-$pythonExe = Join-Path $venvPath "Scripts\\python.exe"
+Set-Location -Path $PSScriptRoot
+
+$venvPath = Join-Path $PSScriptRoot ".venv"
+$pythonExe = Join-Path $venvPath "Scripts\python.exe"
 
 if (-not (Test-Path $venvPath)) {
     python -m venv $venvPath
 }
 
 & $pythonExe -m pip install -U pip
-& $pythonExe -m pip install -r requirements.txt
+& $pythonExe -m pip install -r (Join-Path $PSScriptRoot "requirements.txt")
 
 Write-Host "Setup complete."
-Write-Host "Next: .\\run_all.ps1"
+Write-Host "Next: .\run_all.ps1"
