@@ -14,7 +14,7 @@ python -m pip install -U pip
 pip install -r requirements.txt
 ```
 
-請先移除 `data\outputs`、`data\processed` 中的所有檔案，並擇一執行：
+請先移除 `data\outputs`、`data\processed` 中的所有檔案，並下載 [libe.json](https://figshare.com/ndownloader/files/28071129)後，將其移至 `data\raw`：
 
 ```powershell
 # 需要有本地 Python 環境
@@ -25,19 +25,6 @@ pip install -r requirements.txt
 - Run the PowerShell scripts from the project root (this folder). You do not need to move the `.ps1` files.
 - If PowerShell blocks script execution, run `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` in the same window, then re-run the scripts.
 - Outputs are written under `data/processed/` and `data/outputs/`.
-```
-
-或
-
-```bash
-# 依序執行:
-python src\00_inspect_libe.py
-python src\00b_inspect_nested.py
-python src\01_build_table.py
-python src\02_train_rank.py
-python src\03_explain_and_export.py
-python src\04_family_ranking.py
-python src\05_rule_feedback_retrain.py
 ```
 
 ---
