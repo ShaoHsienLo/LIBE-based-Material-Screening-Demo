@@ -1,0 +1,6 @@
+rank,id,smiles,y_pred,top_features
+1,libe-115813,C.[HH].[LiH],-392.63604736328125,MolWt:+717.0291; HeavyAtomCount:+64.4480; MolLogP:+60.9046; TPSA:-21.3907; NumHDonors:+2.6391
+2,libe-115798,C.[HH].[LiH],-392.63604736328125,MolWt:+717.0291; HeavyAtomCount:+64.4480; MolLogP:+60.9046; TPSA:-21.3907; NumHDonors:+2.6391
+3,libe-224655,C.[HH].[LiH],-392.63604736328125,MolWt:+717.0291; HeavyAtomCount:+64.4480; MolLogP:+60.9046; TPSA:-21.3907; NumHDonors:+2.6391
+4,libe-115803,C.[HH].[LiH],-392.63604736328125,MolWt:+717.0291; HeavyAtomCount:+64.4480; MolLogP:+60.9046; TPSA:-21.3907; NumHDonors:+2.6391
+5,libe-115811,C.[HH].[LiH],-392.63604736328125,MolWt:+717.0291; HeavyAtomCount:+64.4480; MolLogP:+60.9046; TPSA:-21.3907; NumHDonors:+2.6391

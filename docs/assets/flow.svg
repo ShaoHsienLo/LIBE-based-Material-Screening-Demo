@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="360" viewBox="0 0 1200 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Model–Policy–Agentic flow diagram">
+  <defs>
+    <style>
+      .box { fill: #ffffff; stroke: #111827; stroke-width: 2; rx: 16; }
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, "Noto Sans", "PingFang TC", "Microsoft JhengHei", sans-serif; font-size: 16px; font-weight: 700; fill: #111827; }
+      .text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, "Noto Sans", "PingFang TC", "Microsoft JhengHei", sans-serif; font-size: 13px; fill: #111827; }
+      .muted { fill: #374151; font-weight: 500; }
+      .pill { fill: #f3f4f6; stroke: #111827; stroke-width: 1.5; rx: 999; }
+      .arrow { stroke: #111827; stroke-width: 2.5; fill: none; marker-end: url(#arrowhead); }
+      .dash { stroke-dasharray: 6 6; }
+    </style>
+    <marker id="arrowhead" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#111827"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="1200" height="360" fill="#ffffff"/>
+
+  <!-- Layer boxes -->
+  <rect class="box" x="60"  y="70" width="240" height="220" rx="18"/>
+  <rect class="box" x="340" y="70" width="240" height="220" rx="18"/>
+  <rect class="box" x="620" y="70" width="240" height="220" rx="18"/>
+  <rect class="box" x="900" y="70" width="240" height="220" rx="18"/>
+
+  <!-- Titles -->
+  <text class="title" x="80"  y="105">Data Layer</text>
+  <text class="title" x="360" y="105">Representation</text>
+  <text class="title" x="640" y="105">Model Layer</text>
+  <text class="title" x="920" y="105">Policy &amp; Agentic</text>
+
+  <!-- Data Layer content -->
+  <rect class="pill" x="80" y="125" width="200" height="30"/>
+  <text class="text" x="92" y="145">LIBE (JSON)</text>
+
+  <text class="text muted" x="80" y="175">• reaction space fragments</text>
+  <text class="text muted" x="80" y="195">• thermo / bonds / xyz</text>
+  <text class="text muted" x="80" y="215">• exclude raw in GitHub</text>
+  <text class="text muted" x="80" y="235">  (download separately)</text>
+
+  <!-- Representation content -->
+  <rect class="pill" x="360" y="125" width="200" height="30"/>
+  <text class="text" x="372" y="145">Mol + SMILES</text>
+
+  <text class="text muted" x="360" y="175">• RDKit reconstruction</text>
+  <text class="text muted" x="360" y="195">• canonical SMILES</text>
+  <text class="text muted" x="360" y="215">• charge = 0 filter</text>
+  <text class="text muted" x="360" y="235">• per-atom label</text>
+
+  <!-- Model Layer content -->
+  <rect class="pill" x="640" y="125" width="200" height="30"/>
+  <text class="text" x="652" y="145">XGBoost Regression</text>
+
+  <text class="text muted" x="640" y="175">• y_pred: per-atom free energy</text>
+  <text class="text muted" x="640" y="195">• SHAP explainability</text>
+  <text class="text muted" x="640" y="215">• high-throughput ranking</text>
+  <text class="text muted" x="640" y="235">• family aggregation</text>
+
+  <!-- Policy & Agentic content -->
+  <rect class="pill" x="920" y="125" width="200" height="30"/>
+  <text class="text" x="932" y="145">final_score = y_pred + bonus</text>
+
+  <text class="text muted" x="920" y="175">• rule-based nudging</text>
+  <text class="text muted" x="920" y="195">• boundary candidates change</text>
+  <text class="text muted" x="920" y="215">• DFT / experiment trigger</text>
+  <text class="text muted" x="920" y="235">• write-back + retrain/rerank</text>
+
+  <!-- Arrows between boxes -->
+  <path class="arrow" d="M300 180 C320 180, 320 180, 340 180"/>
+  <path class="arrow" d="M580 180 C600 180, 600 180, 620 180"/>
+  <path class="arrow" d="M860 180 C880 180, 880 180, 900 180"/>
+
+  <!-- Feedback loop arrow (Agentic back to data/model) -->
+  <path class="arrow dash" d="M1020 290 C1020 330, 520 330, 520 290"/>
+  <text class="text muted" x="610" y="345">feedback loop (DFT/experiment → label/constraints → update)</text>
+</svg>

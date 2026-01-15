@@ -1,0 +1,318 @@
+﻿<!doctype html>
+<html lang="zh-Hant">  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LIBE MU Demo | Model・Policy・Agentic Walkthrough</title>
+    <meta
+      name="description"
+      content="LIBE-based Material Screening Demo: Data → Representation → Model → Policy → Agentic roadmap (static GitHub Pages)."
+    />
+
+    <link rel="stylesheet" href="./assets/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-grid">
+        <div class="brand">
+          <div class="brand-title">LIBE-based Material Screening Demo</div>
+          <div class="brand-subtitle">Model・Policy・Agent Ready PoC for Battery Electrolyte R&amp;D</div>
+        </div>
+
+        <nav class="top-nav">
+          <a href="#overview">總覽</a>
+          <a href="#quickstart">快速開始</a>
+          <a href="#data-label">資料與標籤</a>
+          <a href="#model">模型與可解釋</a>
+          <a href="#family">Family 排名</a>
+          <a href="#policy-agentic">Policy 與 Agentic</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <!-- ===================== Overview ===================== -->
+      <section id="overview" class="section">
+        <div class="eyebrow">Overview</div>
+        <h1>總覽</h1>
+        <p>
+          這是一個 <strong>靜態展示頁（GitHub Pages）</strong>，用來說明 LIBE
+          Demo 的流程、輸出與後續如何走向 Agentic AI。
+          本頁內容僅讀取 <code>docs/data/</code> 與 <code>docs/assets/</code> 的輸出檔案。
+        </p>
+
+        <div class="callout">
+          <div class="callout-title">Demo 目標</div>
+          <ul>
+            <li><strong>R&amp;D 決策支援</strong>：候選篩選、排序與可解釋性。</li>
+            <li><strong>Policy（Rule）層</strong>：在模型排序上疊加決策偏好。</li>
+            <li><strong>Agentic 延伸</strong>：觸發 DFT / 實驗、寫回標籤並迭代。</li>
+          </ul>
+        </div>
+
+        <h2>系統層級流程：Data → Representation → Model → Policy → Agentic</h2>
+        <figure class="figure">
+          <img src="./assets/flow.svg" alt="Layered flow diagram" class="img-fluid" />
+          <figcaption>
+            層級式架構示意：模型層負責可行性排序、Policy 層做偏好微調，
+            Agentic 觸發外部流程（DFT/實驗）並回寫。
+          </figcaption>
+        </figure>
+      </section>
+
+      <!-- ===================== Quickstart ===================== -->
+      <section id="quickstart" class="section">
+        <div class="eyebrow">Quickstart</div>
+        <h1>快速開始</h1>
+
+        <h2>環境需求</h2>
+        <ul>
+          <li>Python 3.10+（建議 3.10/3.11）</li>
+          <li>Git（可改用 ZIP 下載）</li>
+          <li>LIBE dataset（repo 不含 raw 檔案）</li>
+        </ul>
+
+        <h2>資料放置</h2>
+        <p>下載 LIBE 後請放到：</p>
+        <pre><code>data/raw/libe.json</code></pre>
+
+        <h2>Windows（PowerShell）</h2>
+        <ol>
+          <li>首次執行如果被擋，請參考下方的 PowerShell 解鎖說明。</li>
+          <li>建立環境與安裝依賴：</li>
+        </ol>
+        <pre><code>.\setup.ps1</code></pre>
+        <ol start="3">
+          <li>依序執行 pipeline：</li>
+        </ol>
+        <pre><code>.\run_all.ps1</code></pre>
+
+        <details class="details">
+          <summary>PowerShell 顯示「已停用指令碼執行」怎麼辦？</summary>
+          <p>在同一個視窗先執行：</p>
+          <pre><code>Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser</code></pre>
+          <p>若檔案被封鎖可解除：</p>
+          <pre><code>Unblock-File .\setup.ps1
+Unblock-File .\run_all.ps1</code></pre>
+        </details>
+
+        <h2>macOS / Linux（bash）</h2>
+        <p>若不使用 PowerShell，可手動執行：</p>
+        <pre><code>python -m venv .venv
+source .venv/bin/activate
+python -m pip install -U pip
+python -m pip install -r requirements.txt
+
+# run scripts
+python src/00_inspect_libe.py
+python src/00b_inspect_nested.py
+python src/01_build_table.py
+python src/02_train_rank.py
+python src/03_explain_and_export.py
+python src/04_family_ranking.py
+python src/05_rule_feedback_retrain.py</code></pre>
+
+        <h2>輸出位置</h2>
+        <p>模型輸出：</p>
+        <pre><code>data/outputs/</code></pre>
+        <p>本頁展示資料：</p>
+        <pre><code>docs/data/
+docs/assets/</code></pre>
+      </section>
+
+      <!-- ===================== Data & Label ===================== -->
+      <section id="data-label" class="section">
+        <div class="eyebrow">Data &amp; Label</div>
+        <h1>資料與標籤</h1>
+
+        <h2>為何 LIBE 不能直接當「穩定電解液」清單？</h2>
+        <ul>
+          <li>LIBE 可能含有碎片（H<sub>2</sub>、LiH）或 radical 物種。</li>
+          <li>因此需要重建結構（elements + bonds → RDKit Mol → SMILES）並做語意篩選（如 charge=0）。</li>
+        </ul>
+
+        <h2>為何使用 per-atom free energy</h2>
+        <p>
+          若直接使用 total free energy，較大分子會被放大影響，難以反映結構本身差異。
+          因此改用 per-atom：
+        </p>
+        <pre><code>free_energy_per_atom = free_energy_eV / number_atoms</code></pre>
+        <p>這樣模型更聚焦在「化學結構差異」，而非尺寸大小。</p>
+      </section>
+
+      <!-- ===================== Model & SHAP ===================== -->
+      <section id="model" class="section">
+        <div class="eyebrow">Model &amp; Explainability</div>
+        <h1>模型與可解釋性</h1>
+
+        <h2>模型任務</h2>
+        <ul>
+          <li>模型：XGBoost Regressor</li>
+          <li>輸入：RDKit descriptors（MolWt、TPSA、MolLogP、Donors/Acceptors、HeavyAtomCount...）</li>
+          <li>輸出：per-atom free energy 預測值 <code>y_pred</code></li>
+        </ul>
+
+        <h2>SHAP Summary</h2>
+        <figure class="figure">
+          <img src="./assets/shap_summary.png" alt="SHAP summary plot" class="img-fluid" />
+          <figcaption>顯示各 descriptor 對預測結果的影響方向與強度。</figcaption>
+        </figure>
+
+        <h2>Top explanations（示例）</h2>
+        <p>載入 <code>docs/data/top5_explanations.csv</code>：</p>
+        <div class="table-block">
+          <div class="table-actions">
+            <input class="table-search" type="search" placeholder="搜尋..." data-table-search="top5_explanations" />
+          </div>
+          <div
+            class="data-table"
+            id="tbl-top5-explanations"
+            data-table-key="top5_explanations"
+            data-src="./data/top5_explanations.csv"
+          ></div>
+          <div class="table-note">
+            欄位包含：rank、id、smiles、y_pred、top_features（以 SHAP 顯示特徵貢獻）。
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== Family Ranking ===================== -->
+      <section id="family" class="section">
+        <div class="eyebrow">Family Ranking</div>
+        <h1>Family-level 排名（避免相似分子佔榜）</h1>
+
+        <p>
+          LIBE 可能含有大量相似分子。若只看單筆排序，容易出現家族重複上榜，
+          因此引入 family 概念（例如元素簽名 C-F-N-S）。
+        </p>
+
+        <h2>Family ranking（before feedback）</h2>
+        <div class="table-block">
+          <div class="table-actions">
+            <input class="table-search" type="search" placeholder="搜尋..." data-table-search="family_before_feedback" />
+          </div>
+          <div
+            class="data-table"
+            id="tbl-family-before"
+            data-table-key="family_before_feedback"
+            data-src="./data/family_before_feedback.csv"
+          ></div>
+        </div>
+
+        <h2>Family ranking（after feedback / retrain）</h2>
+        <div class="table-block">
+          <div class="table-actions">
+            <input class="table-search" type="search" placeholder="搜尋..." data-table-search="family_after_feedback" />
+          </div>
+          <div
+            class="data-table"
+            id="tbl-family-after"
+            data-table-key="family_after_feedback"
+            data-src="./data/family_after_feedback.csv"
+          ></div>
+        </div>
+
+        <details class="details">
+          <summary>如何閱讀 family 表</summary>
+          <ul>
+            <li><code>best_y_pred</code>：該 family 內最佳預測值。</li>
+            <li><code>count</code>：該 family 的候選數量。</li>
+            <li><code>feedback_hits</code>：符合 rule/policy 的樣本數。</li>
+          </ul>
+        </details>
+      </section>
+
+      <!-- ===================== Policy & Agentic ===================== -->
+      <section id="policy-agentic" class="section">
+        <div class="eyebrow">Policy &amp; Agentic</div>
+        <h1>Policy Re-ranking 與 Agentic Roadmap</h1>
+
+        <h2>Policy Re-ranking 的目的</h2>
+        <p>
+          模型層回答「物性排序」，但實際決策還需要溶解性、成本與偏好等。
+          因此透過 <strong>Policy（Rule）層</strong> 進行微調，而非完全推翻模型。
+        </p>
+
+        <h2>最終決策分數</h2>
+        <pre><code>final_score = y_pred + policy_bonus</code></pre>
+
+        <h2>Policy 影響摘要（1-in / 1-out）</h2>
+        <p>載入 <code>docs/data/policy_rerank_summary.csv</code>：</p>
+        <div class="table-block">
+          <div
+            class="data-table"
+            id="tbl-policy-summary"
+            data-table-key="policy_rerank_summary"
+            data-src="./data/policy_rerank_summary.csv"
+          ></div>
+          <div class="table-note">
+            觀察 <code>added_count</code> / <code>removed_count</code> 的變動，評估 policy 的影響力。
+          </div>
+        </div>
+
+        <h2>Top20：after feedback（model）</h2>
+        <div class="table-block">
+          <div class="table-actions">
+            <input class="table-search" type="search" placeholder="搜尋..." data-table-search="top20_after_feedback" />
+          </div>
+          <div
+            class="data-table"
+            id="tbl-top20-after"
+            data-table-key="top20_after_feedback"
+            data-src="./data/top20_after_feedback.csv"
+          ></div>
+        </div>
+
+        <h2>Top20：rule reranked（final decision）</h2>
+        <div class="table-block">
+          <div class="table-actions">
+            <input class="table-search" type="search" placeholder="搜尋..." data-table-search="top20_rule_reranked" />
+          </div>
+          <div
+            class="data-table"
+            id="tbl-top20-reranked"
+            data-table-key="top20_rule_reranked"
+            data-src="./data/top20_rule_reranked.csv"
+          ></div>
+        </div>
+
+        <h2>Agentic Roadmap（建議落地路線）</h2>
+        <ol>
+          <li><strong>Policy 篩選</strong>：rule rerank 取 top-K 做為送測清單。</li>
+          <li><strong>觸發外部工具</strong>：Agent 呼叫 DFT workflow / 實驗系統。</li>
+          <li><strong>回寫結果</strong>：將 DFT/實驗結果轉為標籤或約束。</li>
+          <li><strong>更新模型與 policy</strong>：重訓或再排序，逐步優化。</li>
+          <li><strong>形成閉環</strong>：週期性迭代並留下 audit trail。</li>
+        </ol>
+
+        <div class="callout">
+          <div class="callout-title">關鍵訊息（對外展示）</div>
+          <p>
+            好的決策系統需要可追溯與穩定迭代。本 Demo 以 policy
+            做「微調」而非推翻，展現 1-in / 1-out 的可解釋變動。
+          </p>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        <div class="footer-inner">
+          <div>Static site for GitHub Pages. Data files under <code>docs/data/</code>.</div>
+          <div class="footer-links">
+            <a href="../README.md">README</a>
+            <a href="https://github.com/ShaoHsienLo/LIBE-based-Material-Screening-Demo" rel="noopener">GitHub Repo</a>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <script src="./assets/app.js"></script>
+  </body>
+ps://github.com/ShaoHsienLo/LIBE-based-Material-Screening-Demo" rel="noopener">GitHub Repo</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <!-- Site JS: render tables from CSV, attach search handlers, etc. -->
+  <script src="./assets/app.js"></script>
+</body>
+</html>
